@@ -6,8 +6,14 @@ import twitterLogo from './assets/twitter-logo.svg';
 const TWITTER_HANDLE = 'joninsley';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
+// Add the domain you will be minting
+const tld = '.pshhh';
+const CONTRACT_ADDRESS = '0xfe60ac78eA40d5430c11A47078AB195FA8738FFd';
+
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState('');
+  const [domain, setDomain] = useState('');
+  const [record, setRecord] = useState('');
 
   const connectWallet = async () => {
 		try {
@@ -18,7 +24,7 @@ const App = () => {
 				return;
 			}
 
-			// Fancy method to request access to account.
+			// Request access to account.
 			const accounts = await ethereum.request({ method: "eth_requestAccounts" });
 
 			// print out public address once Metamask is authorized.
@@ -62,6 +68,40 @@ const App = () => {
 		</div>
   );
 
+  // Form to enter domain name and data
+	const renderInputForm = () =>{
+		return (
+			<div className="form-container">
+				<div className="first-row">
+					<input
+						type="text"
+						value={domain}
+						placeholder='domain'
+						onChange={e => setDomain(e.target.value)}
+					/>
+					<p className='tld'> {tld} </p>
+				</div>
+
+				<input
+					type="text"
+					value={record}
+					placeholder="What's on your mind?"
+					onChange={e => setRecord(e.target.value)}
+				/>
+
+				<div className="button-container">
+					<button className='cta-button mint-button' disabled={null} onClick={null}>
+						Mint
+					</button>  
+					<button className='cta-button mint-button' disabled={null} onClick={null}>
+						Set data
+					</button>  
+				</div>
+
+			</div>
+		);
+	}
+
 	// This runs our function when the page loads.
 	useEffect(() => {
 		checkIfWalletIsConnected();
@@ -81,6 +121,8 @@ const App = () => {
 
         {/* Hide the connect button if currentAccount isn't empty*/}
 				{!currentAccount && renderNotConnectedContainer()}
+        {/* Render the input form if an account is connected */}
+				{currentAccount && renderInputForm()}
 
         <div className="footer-container">
 					<img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
