@@ -9,6 +9,26 @@ const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState('');
 
+  const connectWallet = async () => {
+		try {
+			const { ethereum } = window;
+
+			if (!ethereum) {
+				alert("Download MetaMask -> https://metamask.io/");
+				return;
+			}
+
+			// Fancy method to request access to account.
+			const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+
+			// print out public address once Metamask is authorized.
+			console.log("Connected", accounts[0]);
+			setCurrentAccount(accounts[0]);
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
 	const checkIfWalletIsConnected = async () => {
 		// First make sure we have access to window.ethereum
 		const { ethereum } = window;
@@ -36,7 +56,7 @@ const App = () => {
 	// Create a function to render if wallet is not connected yet
 	const renderNotConnectedContainer = () => (
 		<div className="connect-wallet-container">
-			<button className="cta-button connect-wallet-button">
+			<button onClick={connectWallet} className="cta-button connect-wallet-button">
 				Connect Wallet
 			</button>
 		</div>
@@ -59,7 +79,8 @@ const App = () => {
 					</header>
 				</div>
 
-        {renderNotConnectedContainer()}
+        {/* Hide the connect button if currentAccount isn't empty*/}
+				{!currentAccount && renderNotConnectedContainer()}
 
         <div className="footer-container">
 					<img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
