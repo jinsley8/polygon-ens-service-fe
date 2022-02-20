@@ -126,6 +126,48 @@ const App = () => {
     }
   }
 
+  // Switch netowrks if not Polygon
+  const switchNetwork = async () => {
+    if (window.ethereum) {
+      try {
+        // Try to switch to the Mumbai testnet
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x13881' }],
+        });
+      } catch (error) {
+        // The chain we want has not been added to MetaMask
+        // Ssk the user to add it to their MetaMask
+        if (error.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {	
+                  chainId: '0x13881',
+                  chainName: 'Polygon Mumbai Testnet',
+                  rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
+                  nativeCurrency: {
+                      name: "Mumbai Matic",
+                      symbol: "MATIC",
+                      decimals: 18
+                  },
+                  blockExplorerUrls: ["https://mumbai.polygonscan.com/"]
+                },
+              ],
+            });
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        console.log(error);
+      }
+    } else {
+      // If window.ethereum is not found then MetaMask is not installed
+      alert('MetaMask is not installed. Please install it to use this app: https://metamask.io/download.html');
+    }
+  }
+
 	// Create a function to render if wallet is not connected yet
 	const renderNotConnectedContainer = () => (
 		<div className="connect-wallet-container">
@@ -137,6 +179,18 @@ const App = () => {
 
   // Form to enter domain name and data
 	const renderInputForm = () =>{
+
+    // If not on Polygon Mumbai Testnet, render the switch button
+  	if (network !== 'Polygon Mumbai Testnet') {
+  		return (
+  			<div className="connect-wallet-container">
+  				<h2>Please switch to Polygon Mumbai Testnet</h2>
+  				{/* Call switch network function */}
+  				<button className='cta-button mint-button' onClick={switchNetwork}>Click here to switch</button>
+  			</div>
+  		);
+  	}
+
 		return (
 			<div className="form-container">
 				<div className="first-row">
