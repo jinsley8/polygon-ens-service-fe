@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import contractABI from './utils/contractABI.json';
 import { networks } from './utils/networks';
+import LoadingIndicator from './components/LoadingIndicator';
 
 import './styles/App.css';
 import twitterLogo from './assets/twitter-logo.svg';
@@ -142,12 +143,12 @@ const App = () => {
 
       try {
         const { ethereum } = window;
-        
+
         if (ethereum) {
           const provider = new ethers.providers.Web3Provider(ethereum);
           const signer = provider.getSigner();
           const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI.abi, signer);
-    
+
           let tx = await contract.setRecord(domain, record);
           await tx.wait();
           console.log("Record set! https://mumbai.polygonscan.com/tx/"+tx.hash);
@@ -282,17 +283,27 @@ const App = () => {
         {/* If the editing variable is true, return the "Set record" and "Cancel" button */}
 				{editing ? (
 					<div className="button-container">
-						<button className='cta-button mint-button' disabled={loading} onClick={updateDomain}>
-							Set record
-						</button>  
-						<button className='cta-button mint-button' onClick={() => {setEditing(false)}}>
-							Cancel
-						</button>  
+            {!loading ? (
+              <>
+    						<button className='cta-button mint-button' disabled={loading} onClick={updateDomain}>
+    							Set record
+    						</button>
+    						<button className='cta-button mint-button' onClick={() => {setEditing(false)}}>
+    							Cancel
+    						</button>
+              </>
+            ) : (
+              <LoadingIndicator />
+            )}
 					</div>
 				) : (
-					<button className='cta-button mint-button' disabled={loading} onClick={mintDomain}>
-						Mint
-					</button>  
+          !loading ? (
+  					<button className='cta-button mint-button' disabled={loading} onClick={mintDomain}>
+  						Mint
+  					</button>
+          ) : (
+            <LoadingIndicator />
+          )
 				)}
 			</div>
 		);
